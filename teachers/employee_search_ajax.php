@@ -44,7 +44,7 @@ if (isset($_GET['query'])) {
     // Fetch matching employees
     $employees_query = "
         SELECT 
-            EMPID, `Full name` AS name, `Mail ID (Ielektron)` AS email, 
+            EMPID As emp_id, `Full name` AS name, `Mail ID (Ielektron)` AS email, 
             `Programming skills` AS skills 
         FROM employee_details
         WHERE `Full name` LIKE ? OR `Programming skills` LIKE ?
@@ -71,4 +71,3 @@ if (isset($_GET['query'])) {
     echo json_encode($response);
     exit();
 }
-?>

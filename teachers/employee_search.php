@@ -34,10 +34,6 @@ error_reporting(0);
             font-size: 1rem;
         } */
 
-        #results {
-            margin-top: 20px;
-        }
-
         .employee-card {
             padding: 10px;
             border: 1px solid #ddd;
@@ -47,6 +43,7 @@ error_reporting(0);
         }
 
         #search-count {
+            text-align: right;
             margin-top: 10px;
             font-size: 0.9rem;
         }
@@ -103,6 +100,41 @@ error_reporting(0);
         .employee-card:hover {
             background-color: #e9e9e9;
             /* Highlight on hover for better UX */
+        }
+
+        #results-container {
+            max-height: 510px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+
+        .employee-card:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Make all checkboxes bigger */
+        input[type="checkbox"] {
+            /* width: 20px; */
+            /* Adjust as per your need */
+            /* height: 20px; */
+            /* Adjust as per your need */
+            /* transform: scale(1.5); */
+            /* Scale up the size */
+            /* cursor: pointer; */
+            /* Adds pointer for better UX */
+            /* margin-right: 10px; */
+        }
+
+        /* Optional: Add margin to give space between text and checkbox */
+        label {
+            /* margin: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px; */
+            /* Space between checkbox and text */
         }
     </style>
 </head>
@@ -198,26 +230,38 @@ error_reporting(0);
                     <h2>Employee Skills Distribution</h2>
                     <canvas id="skillsChart" width="400" height="200"></canvas>
                 </div>
+
                 <!-- <div class="search-employees">
                     <h2>Search Employees</h2>
                     <input type="text" id="search-bar" placeholder="Search by name or skill..." oninput="searchEmployees()">
-                    <p id="search-count" style="font-weight: bold;">Showing 0 of 0 employees</p>
+                    <p id="search-count" style="font-weight: bold;">Showing 0 of 0 employees</p> 
+                    <br />
+                    <div id="results-container">
 
-                    <div id="results"></div>
+                        <div id="results">
+                        </div>
+                    </div>
                 </div> -->
 
                 <div class="search-employees">
                     <h2>Search Employees</h2>
                     <input type="text" id="search-bar" placeholder="Search by name or skill..." oninput="searchEmployees()">
-                    <p id="search-count" style="font-weight: bold;">Showing 0 of 0 employees</p> <!-- Count display -->
-                    <br />
+                    <p id="search-count">Showing 0 of 0 employees</p>
+                    <div class="test-assignment" style="margin-bottom: 10px; ">
+                        <label for="test-select">Select Test:</label>
+                        <select id="test-select">
+                            <!-- <option value="">-- Select a Test --</option>
+                            <option value="test1">Python Basics</option>
+                            <option value="test2">JavaScript Advanced</option>
+                            <option value="test3">Data Structures</option> -->
+                        </select>
+                        <button onclick="assignTest()" style="padding:3px; text-align:right; margin-left: 10px;">Send Notification</button>
+                    </div>
                     <div id="results-container">
-
-                        <div id="results">
-                            <!-- Results will populate here -->
-                        </div>
+                        <div id="results"></div>
                     </div>
                 </div>
+
 
             </div>
         </div>
@@ -226,42 +270,104 @@ error_reporting(0);
 
     <script src="../js/script.js"></script>
     <script>
+        // function searchEmployees() {
+        //     const query = document.getElementById('search-bar').value;
+
+        //     fetch(`employee_search_ajax.php?query=${encodeURIComponent(query)}`)
+        //         .then(response => {
+        //             if (!response.ok) {
+        //                 throw new Error(`HTTP error! Status: ${response.status}`);
+        //             }
+        //             return response.json();
+        //         })
+        //         .then(data => {
+        //             console.log(data.employees[0])
+        //             const resultsDiv = document.getElementById('results');
+        //             const countDiv = document.getElementById('search-count');
+
+        //             // Display counts (filtered and total)
+        //             countDiv.innerText = `Showing ${data.filtered_count} of ${data.total_count} employees`;
+
+        //             resultsDiv.innerHTML = ''; // Clear previous results
+
+        //             if (data.employees.length === 0) {
+        //                 resultsDiv.innerHTML = '<p>No employees found.</p>';
+        //                 return;
+        //             }
+
+        //             // Populate employee data
+        //             data.employees.forEach(employee => {
+        //                 const employeeDiv = document.createElement('div');
+        //                 employeeDiv.classList.add('employee-card');
+
+        //                 employeeDiv.innerHTML = `
+        //                     <label>
+        //                         <input type="checkbox" class="employee-select" value="${employee.emp_id} - ${employee.email}">
+        //                         <span>${employee.name} <br /> (${employee.skills || 'No skills listed'})</span>
+        //                     </label>
+        //                     <p>Email: ${employee.email}</p>
+        //                 `;
+        //                 resultsDiv.appendChild(employeeDiv);
+        //             });
+
+        // const searchContainer = document.querySelector('.search-employees'); // Parent container of the search bar
+        // searchContainer.scrollIntoView({
+        //     behavior: "smooth", // Smooth scrolling
+        //     block: "start" // 
+        // });
+        //         })
+        //         .catch(error => {
+        //             console.error('Error fetching employees:', error);
+        //         });
+        // }
+
         function searchEmployees() {
-            const query = document.getElementById('search-bar').value;
+            const query = document.getElementById("search-bar").value;
 
             fetch(`employee_search_ajax.php?query=${encodeURIComponent(query)}`)
-                .then(response => {
+                .then((response) => {
                     if (!response.ok) {
                         throw new Error(`HTTP error! Status: ${response.status}`);
                     }
                     return response.json();
                 })
-                .then(data => {
-                    const resultsDiv = document.getElementById('results');
-                    const countDiv = document.getElementById('search-count');
+                .then((data) => {
+                    const resultsDiv = document.getElementById("results");
 
-                    // Display counts (filtered and total)
-                    countDiv.innerText = `Showing ${data.filtered_count} of ${data.total_count} employees`;
-
-                    resultsDiv.innerHTML = ''; // Clear previous results
-
+                    resultsDiv.innerHTML = ""; // Clear previous results
                     if (data.employees.length === 0) {
-                        resultsDiv.innerHTML = '<p>No employees found.</p>';
+                        resultsDiv.innerHTML = "<p>No employees found.</p>";
                         return;
                     }
 
-                    // Populate employee data
-                    data.employees.forEach(employee => {
-                        const employeeDiv = document.createElement('div');
-                        employeeDiv.classList.add('employee-card');
+                    // Create Select All option dynamically
+                    const selectAllDiv = document.createElement("div");
+                    selectAllDiv.innerHTML = `
+                <label>
+                    <input type="checkbox" id="select-all" /> Select All
+                </label>
+            `;
+                    resultsDiv.appendChild(selectAllDiv);
 
+                    // Populate employee data
+                    data.employees.forEach((employee) => {
+                        const employeeDiv = document.createElement("div");
+                        employeeDiv.classList.add("employee-card");
+
+                        // Render employee details with a checkbox
                         employeeDiv.innerHTML = `
-                    <h3>${employee.name}</h3>
-                    <p>Email: ${employee.email}</p>
-                    <p>Skills: ${employee.skills || 'None listed'}</p>
+                    <label>
+                        <input type="checkbox" class="employee-checkbox" data-id="${employee.id}" data-email="${employee.email}" />
+                        ${employee.name} <br /> Skills :  ${employee.skills || "None listed"}
+                        <br />
+                        Email : ${employee.email}
+                    </label>
                 `;
                         resultsDiv.appendChild(employeeDiv);
                     });
+
+                    // Initialize Select All functionality after rendering
+                    initializeSelectAll();
 
                     const searchContainer = document.querySelector('.search-employees'); // Parent container of the search bar
                     searchContainer.scrollIntoView({
@@ -269,8 +375,8 @@ error_reporting(0);
                         block: "start" // 
                     });
                 })
-                .catch(error => {
-                    console.error('Error fetching employees:', error);
+                .catch((error) => {
+                    console.error("Error fetching employees:", error);
                 });
         }
 
@@ -305,8 +411,73 @@ error_reporting(0);
             });
         }
 
+        function assignTest() {
+            const selectedEmployees = Array.from(document.querySelectorAll('.employee-select:checked'))
+                .map(input => input.value); // Collect employee IDs
+
+            const selectedTest = document.getElementById('test-select').value;
+
+            if (selectedEmployees.length === 0) {
+                alert('Please select at least one employee.');
+                return;
+            }
+
+            if (!selectedTest) {
+                alert('Please select a test.');
+                return;
+            }
+
+            // Log the selections for now
+            console.log('Selected Employees:', selectedEmployees);
+            console.log('Selected Test:', selectedTest);
+
+            // Show confirmation (simulate notification sending for now)
+            alert('Notifications sent successfully (check the console).');
+        }
+
+        async function loadTests() {
+            const response = await fetch("fetch_tests.php");
+            const testNames = await response.json();
+
+            const testSelect = document.getElementById("test-select");
+            testSelect.innerHTML = '<option value="">-- Select a Test --</option>'; // Clear previous options
+
+            testNames.forEach(test => {
+                const option = document.createElement("option");
+                option.value = test;
+                option.textContent = test;
+                testSelect.appendChild(option);
+            });
+        }
+
+        function initializeSelectAll() {
+            const selectAllCheckbox = document.getElementById("select-all");
+            const employeeCheckboxes = document.querySelectorAll(".employee-checkbox");
+
+            // Add event listener for "Select All"
+            selectAllCheckbox.addEventListener("change", function() {
+                employeeCheckboxes.forEach((checkbox) => {
+                    checkbox.checked = this.checked;
+                });
+            });
+
+            // Add event listeners for individual employee checkboxes
+            employeeCheckboxes.forEach((checkbox) => {
+                checkbox.addEventListener("change", function() {
+                    // Update "Select All" checkbox based on individual checkboxes
+                    const allChecked = Array.from(employeeCheckboxes).every((cb) => cb.checked);
+                    selectAllCheckbox.checked = allChecked;
+                });
+            });
+        }
+
         // Call the function on page load
-        document.addEventListener("DOMContentLoaded", loadSkillsAnalytics);
+        document.addEventListener("DOMContentLoaded", () => {
+                loadTests();
+                loadSkillsAnalytics();
+            }
+
+        );
     </script>
 </body>
 
